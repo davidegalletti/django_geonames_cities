@@ -3,15 +3,13 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 import json
 
+
 class ApiCountriesTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
 
     def test_not_authenticated(self):
-        """
-
-        """
         response = self.client.get('%s%s' % (reverse('geonames:countries'), '?term=tal'))
         #302 relocated al login
         self.assertEqual(response.status_code, 302)
@@ -63,5 +61,3 @@ class ApiCountriesTests(TestCase):
             if c['label'] == 'Andorra la Vella':
                 finds_andorra_city = True
         self.assertIs(finds_andorra_city, True)
-
-
