@@ -126,3 +126,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 GEONAMES_INCLUDE_COUNTRIES = ['AD']
 GEONAMES_DEST_PATH = '/tmp/'
 GEONAMES_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLS']
+
+# La versione va scritta qui, su setup.cfg e su database_logger/__init__.py
+version = "0.4"
+version_comment = "0.4 version number in all files"

@@ -1,0 +1,4 @@
+/.idea/
+/dist/
+/django_geonames_cities.egg-info/
+/db.sqlite3
