@@ -85,7 +85,7 @@ class GeonamesAdm4(GeonamesAdm):
 
 
 class GeonamesAdm5(GeonamesAdm):
-    adm4 = models.ForeignKey(GeonamesAdm4, on_delete=models.CASCADE)
+    adm4 = models.ForeignKey(GeonamesAdm4, on_delete=models.CASCADE, db_index=True)
 
     @property
     def country(self):
@@ -104,4 +104,6 @@ class PopulatedPlace(GeonamesAdm):
     adm4 = models.ForeignKey(GeonamesAdm4, blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        if self.name:
+            return self.name
+        return '--'
