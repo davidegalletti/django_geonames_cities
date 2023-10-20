@@ -49,30 +49,47 @@ def municipalities(request):
         for ml in country.municipality_levels.split(" "):
             content_types.append(ContentType.objects.get(app_label='geonames', model__iexact=ml))
         municipalities = []
+        exact_matches = []
         n_of_results = 20
         for ct in content_types:
             if ct.model == "geonamesadm1":
+                exact_matches += GeonamesAdm1.objects.filter(name__iexact=q, country__id=country_id)[:n_of_results]
                 municipalities += GeonamesAdm1.objects.filter(name__icontains=q, country__id=country_id)[:n_of_results]
             elif ct.model == "geonamesadm2":
+                exact_matches += GeonamesAdm2.objects.filter(name__iexact=q, adm1__country__id=country_id)[
+                                  :n_of_results]
                 municipalities += GeonamesAdm2.objects.filter(name__icontains=q, adm1__country__id=country_id)[
                                   :n_of_results]
             elif ct.model == "geonamesadm3":
+                exact_matches += GeonamesAdm3.objects.filter(name__iexact=q, adm2__adm1__country__id=country_id)[
+                                  :n_of_results]
                 municipalities += GeonamesAdm3.objects.filter(name__icontains=q, adm2__adm1__country__id=country_id)[
                                   :n_of_results]
             elif ct.model == "geonamesadm4":
+                exact_matches += GeonamesAdm4.objects.filter(name__iexact=q, adm3__adm2__adm1__country__id=country_id)[
+                                  :n_of_results]
                 municipalities += GeonamesAdm4.objects.filter(name__icontains=q,
                                                               adm3__adm2__adm1__country__id=country_id)[:n_of_results]
             elif ct.model == "geonamesadm5":
+                exact_matches += GeonamesAdm5.objects.filter(name__iexact=q,
+                                                             adm4__adm3__adm2__adm1__country__id=country_id)[
+                                  :n_of_results]
                 municipalities += GeonamesAdm5.objects.filter(name__icontains=q,
                                                               adm4__adm3__adm2__adm1__country__id=country_id)[
                                   :n_of_results]
             elif ct.model == "populatedplace":
+                exact_matches += PopulatedPlace.objects.filter(name__iexact=q, country__id=country_id)[:n_of_results]
                 municipalities += PopulatedPlace.objects.filter(name__icontains=q, country__id=country_id)[
                                   :n_of_results]
-        # TODO: if I have an exact match I send it as the first result;
-        #  also if it starts with is to be prioritizes ws contains
+        exact_matches.sort(key=lambda x: x.name)
+        # TODO: if it starts with is to be prioritizes ws contains
         municipalities.sort(key=lambda x: x.name)
-        for m in municipalities:
+        # I remove duplicates
+        for m in exact_matches:
+            if m in municipalities:
+                municipalities.remove(m)
+        # if I have an exact match I send it as the first result;
+        for m in exact_matches + municipalities:
             municipality_json = {}
             municipality_json['id'] = m.id
             municipality_json['label'] = m.name
