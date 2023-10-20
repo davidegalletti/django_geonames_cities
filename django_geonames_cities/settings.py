@@ -128,5 +128,5 @@ GEONAMES_DEST_PATH = '/tmp/'
 GEONAMES_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLS']
 
 # La versione va scritta qui, su setup.cfg e su geonames/__init__.py
-VERSION = '0.5'
-VERSION_COMMENT = 'Fix __str__ PopulatedPlace'
+VERSION = '0.6'
+VERSION_COMMENT = 'api municipalities exact matches first'
