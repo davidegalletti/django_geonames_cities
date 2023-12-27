@@ -58,6 +58,8 @@ class GeonamesAdm3(GeonamesAdm):
     postal_code = models.CharField("Postal Code", max_length=10)
     # Italian municipalities are adm3 and have a code used to calculate Codice Fiscale
     it_codice_catastale = models.CharField(max_length=4, blank=True, null=True)
+    # and another code used by Regione Toscana
+    it_codice_istat = models.CharField(max_length=6, blank=True, null=True)
 
     @property
     def country(self):

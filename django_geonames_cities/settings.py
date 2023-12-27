@@ -121,9 +121,9 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-GEONAMES_INCLUDE_COUNTRIES = ['AD']
+GEONAMES_INCLUDE_COUNTRIES = ['AD', 'IT']
 GEONAMES_DEST_PATH = '/tmp/'
 GEONAMES_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLS']
 
