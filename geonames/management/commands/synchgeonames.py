@@ -191,7 +191,7 @@ class Command(BaseCommand):
                 if current_country_m_level == 0:
                     logger.warning("Country %s has no setting for municipality level" % c.code)
                 current_country = Country.objects.get(code=c)
-                if (c not in countries_excluded) and not current_country.data_loaded:
+                if (c not in countries_excluded):
                     logger.debug("synchgeonames importing %s %s" % (c, settings.GEONAMES_DEST_PATH + c + ".txt"))
                     with open(settings.GEONAMES_DEST_PATH + c + ".txt", 'r') as geonames_file:
                         csv_reader = csv.reader(geonames_file, delimiter='\t', quotechar="\\")
@@ -207,11 +207,18 @@ class Command(BaseCommand):
                                 if n_records % log_every_n_records == 0:
                                     logger.debug(
                                         "synchgeonames importing adm1 %s %s. %s records" % (
-                                        row[ICity.countryCode], row[ICity.name], n_records))
+                                            row[ICity.countryCode], row[ICity.name], n_records))
                                 n_records += 1
                                 try:
-                                    adm = GeonamesAdm1(name=row[ICity.name], code=row[ICity.admin1Code],
-                                                       country=country_dict[row[ICity.countryCode]])
+                                    if GeonamesAdm1.objects.filter(code=row[ICity.admin1Code],
+                                                                   country=country_dict[
+                                                                       row[ICity.countryCode]]).exists():
+                                        adm = GeonamesAdm1.objects.get(code=row[ICity.admin1Code],
+                                                                       country=country_dict[row[ICity.countryCode]])
+                                    else:
+                                        adm = GeonamesAdm1(code=row[ICity.admin1Code],
+                                                           country=country_dict[row[ICity.countryCode]])
+                                    adm.name = row[ICity.name]
                                     adm.save()
                                     adm1_dict[row[ICity.admin1Code]] = adm
                                     try:
@@ -237,8 +244,14 @@ class Command(BaseCommand):
                                             row[ICity.countryCode], row[ICity.name], n_records))
                                 n_records += 1
                                 try:
-                                    adm = GeonamesAdm2(name=row[ICity.name], code=row[ICity.admin2Code],
-                                                       adm1=adm1_dict[row[ICity.admin1Code]])
+                                    if GeonamesAdm2.objects.filter(code=row[ICity.admin2Code],
+                                                                   adm1=adm1_dict[row[ICity.admin1Code]]).exists():
+                                        adm = GeonamesAdm2.objects.get(code=row[ICity.admin2Code],
+                                                                       adm1=adm1_dict[row[ICity.admin1Code]])
+                                    else:
+                                        adm = GeonamesAdm2(code=row[ICity.admin2Code],
+                                                           adm1=adm1_dict[row[ICity.admin1Code]])
+                                    adm.name = row[ICity.name]
                                     adm.save()
                                     adm2_dict[row[ICity.admin2Code]] = adm
                                     try:
@@ -264,8 +277,14 @@ class Command(BaseCommand):
                                             row[ICity.countryCode], row[ICity.name], n_records))
                                 n_records += 1
                                 try:
-                                    adm = GeonamesAdm3(name=row[ICity.name], code=row[ICity.admin3Code],
-                                                       adm2=adm2_dict[row[ICity.admin2Code]])
+                                    if GeonamesAdm3.objects.filter(code=row[ICity.admin3Code],
+                                                           adm2=adm2_dict[row[ICity.admin2Code]]).exists():
+                                        adm = GeonamesAdm3.objects.get(code=row[ICity.admin3Code],
+                                                           adm2=adm2_dict[row[ICity.admin2Code]])
+                                    else:
+                                        adm = GeonamesAdm3(code=row[ICity.admin3Code],
+                                                           adm2=adm2_dict[row[ICity.admin2Code]])
+                                    adm.name = row[ICity.name]
                                     adm.save()
                                     adm3_dict[row[ICity.admin3Code]] = adm
                                     try:
@@ -293,13 +312,25 @@ class Command(BaseCommand):
                                 n_records += 1
                                 try:
                                     if row[ICity.admin3Code]:
-                                        adm = GeonamesAdm4(name=row[ICity.name], code=row[ICity.admin4Code],
-                                                           adm3=adm3_dict[row[ICity.admin3Code]])
+                                        if GeonamesAdm4.objects.filter(code=row[ICity.admin4Code],
+                                                               adm3=adm3_dict[row[ICity.admin3Code]]).exists():
+                                            adm = GeonamesAdm4.objects.get(code=row[ICity.admin4Code],
+                                                               adm3=adm3_dict[row[ICity.admin3Code]])
+                                        else:
+                                            adm = GeonamesAdm4(code=row[ICity.admin4Code],
+                                                               adm3=adm3_dict[row[ICity.admin3Code]])
+                                        adm.name = row[ICity.name]
                                         adm.save()
                                         adm4_dict[row[ICity.admin4Code]] = adm
                                     elif row[ICity.admin2Code]:
-                                        adm = GeonamesAdm4(name=row[ICity.name], code=row[ICity.admin4Code],
-                                                           adm2=adm2_dict[row[ICity.admin2Code]])
+                                        if GeonamesAdm4.objects.filter(code=row[ICity.admin4Code],
+                                                               adm2=adm2_dict[row[ICity.admin2Code]]).exists():
+                                            adm = GeonamesAdm4.objects.get(code=row[ICity.admin4Code],
+                                                               adm2=adm2_dict[row[ICity.admin2Code]])
+                                        else:
+                                            adm = GeonamesAdm4(code=row[ICity.admin4Code],
+                                                               adm2=adm2_dict[row[ICity.admin2Code]])
+                                        adm.name = row[ICity.name]
                                         adm.save()
                                         adm4_dict[row[ICity.admin4Code]] = adm
                                     else:
@@ -325,10 +356,14 @@ class Command(BaseCommand):
                                 if n_records % log_every_n_records == 0:
                                     logger.debug(
                                         "synchgeonames importing adm5 %s %s. %s records" % (
-                                        row[ICity.countryCode], row[ICity.name], n_records))
+                                            row[ICity.countryCode], row[ICity.name], n_records))
                                 n_records += 1
                                 try:
-                                    adm = GeonamesAdm5(name=row[ICity.name], adm4=adm4_dict[row[ICity.admin4Code]])
+                                    if GeonamesAdm5.objects.filter(adm4=adm4_dict[row[ICity.admin4Code]]).exists():
+                                        adm = GeonamesAdm5.objects.get(adm4=adm4_dict[row[ICity.admin4Code]])
+                                    else:
+                                        adm = GeonamesAdm5(adm4=adm4_dict[row[ICity.admin4Code]])
+                                    adm.name = row[ICity.name]
                                     adm.save()
                                     try:
                                         adm5_2b_deleted.remove(adm.name)
@@ -340,10 +375,11 @@ class Command(BaseCommand):
                         # populated places
                         geonames_file.seek(0)
                         pp_2b_deleted = []
-                        for g in PopulatedPlace.objects.filter(
-                                Q(adm1__country_id=current_country.id) | Q(adm2__country_id=current_country.id) | Q(
-                                        adm3__country_id=current_country.id) | Q(
-                                        adm4__country_id=current_country.id)).values('feature_code'):
+                        for g in PopulatedPlace.objects.filter(Q(adm1__country_id=current_country.id) |
+                                           Q(adm2__adm1__country_id=current_country.id) |
+                                           Q(adm3__adm2__adm1__country_id=current_country.id) |
+                                           Q(adm4__adm3__adm2__adm1__country_id=current_country.id) |
+                                           Q(adm4__adm2__adm1__country_id=current_country.id)).values('feature_code'):
                             pp_2b_deleted.append(g['feature_code'])
                         for row in csv_reader:
                             if row[ICity.featureCode] in GEONAMES_INCLUDE_CITY_TYPES \
@@ -351,11 +387,17 @@ class Command(BaseCommand):
                                 if n_records % log_every_n_records == 0:
                                     logger.debug(
                                         "synchgeonames importing ppl %s %s. %s records" % (
-                                        row[ICity.countryCode], row[ICity.name], n_records))
+                                            row[ICity.countryCode], row[ICity.name], n_records))
                                 n_records += 1
                                 try:
-                                    pp = PopulatedPlace(name=row[ICity.name], feature_code=row[ICity.featureCode],
-                                                        country=country_dict[row[ICity.countryCode]])
+                                    if PopulatedPlace.objects.filter(feature_code=row[ICity.featureCode],
+                                                            country=country_dict[row[ICity.countryCode]]).exists():
+                                        pp = PopulatedPlace.objects.get(feature_code=row[ICity.featureCode],
+                                                            country=country_dict[row[ICity.countryCode]])
+                                    else:
+                                        pp = PopulatedPlace(feature_code=row[ICity.featureCode],
+                                                            country=country_dict[row[ICity.countryCode]])
+                                    pp.name = row[ICity.name]
                                     if row[ICity.admin1Code]:
                                         try:
                                             pp.adm1 = adm1_dict[row[ICity.admin1Code]]
@@ -439,6 +481,7 @@ class Command(BaseCommand):
                                             # Let's use ISTAT names ( geonames has Genoa instead of Genova, ISTAT has
                                             # it right )
                                             adm3.it_codice_catastale = row[IComuneItaliano.Codice_Catastale_del_comune]
+                                            adm3.it_codice_istat = row[IComuneItaliano.Codice_Comune_formato_alfanumerico].zfill(5)
                                             adm3.save()
                                         except Exception as ex:
                                             logger.error(

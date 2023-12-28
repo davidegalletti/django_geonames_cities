@@ -34,6 +34,7 @@ class Command(BaseCommand):
         ):
             # import the country file
             try:
+                country_2b_deleted = [c['code'] for c in Country.objects.all().values('code')]
                 with open(settings.GEONAMES_DEST_PATH + "countryInfo.txt", 'r') as geonames_file:
                     csv_reader = csv.reader(geonames_file, delimiter='\t', quotechar="\\")
                     for row in csv_reader:
@@ -42,10 +43,12 @@ class Command(BaseCommand):
                                 c = Country.objects.get(code=row[0])
                             else:
                                 c = Country(code=row[0])
+                            country_2b_deleted.remove(c.code)
                             c.name=row[4]
                             if c.code in municipality_levels.keys():
                                 c.municipality_levels = municipality_levels[c.code]
                             c.save()
                             country_dict[row[0]] = c
+                Country.objects.filter(code__in=country_2b_deleted).delete()
             except Exception as ex:
                 logger.error("Error %s" % str(ex))
