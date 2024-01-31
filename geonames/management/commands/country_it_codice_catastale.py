@@ -243,7 +243,6 @@ def fixture_country_it_codice_catastale():
         Country.objects.filter(code='VU').update(it_codice_catastale='Z733')
         Country.objects.filter(code='WF').update(it_codice_catastale='Z729')
 
-
     except Exception as ex:
         logger.error("fixture_country_it_codice_catastale: %s" % str(ex))
         raise Exception("fixture_country_it_codice_catastale: %s" % str(ex))
