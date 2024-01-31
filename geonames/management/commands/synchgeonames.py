@@ -170,14 +170,10 @@ class Command(BaseCommand):
             # download the files
             for c in countries:
                 if c not in countries_excluded:
-                    downloader = Downloader()
-                    if downloader.download(
-                            source=base_url + c + ".zip",
-                            destination=settings.GEONAMES_DEST_PATH + c + ".zip",
-                            force=False
-                    ):
+                    zip_path = settings.GEONAMES_DEST_PATH + c + ".zip"
+                    downloader = Downloader(base_url + c + ".zip", zip_path)
+                    if downloader.download(False):
                         # extract the file
-                        zip_path = settings.GEONAMES_DEST_PATH + c + ".zip"
                         with ZipFile(zip_path, 'r') as myzip:
                             myzip.extract(c + ".txt", settings.GEONAMES_DEST_PATH)
             # Let's import them
@@ -435,13 +431,10 @@ class Command(BaseCommand):
                     '   Codice Catastale
                     '''
                     istat_permalink = "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv"
-                    downloader = Downloader()
-                    if downloader.download(
-                            source=istat_permalink,
-                            destination=settings.GEONAMES_DEST_PATH + "Elenco-comuni-italiani.csv",
-                            force=False
-                    ):
-                        with open(settings.GEONAMES_DEST_PATH + "Elenco-comuni-italiani.csv", 'r',
+                    path_comuni_it = settings.GEONAMES_DEST_PATH + "Elenco-comuni-italiani.csv"
+                    downloader = Downloader(istat_permalink, path_comuni_it)
+                    if downloader.download(False):
+                        with open(path_comuni_it, 'r',
                                   encoding="ISO-8859-1") as istat_file:
                             csv_reader = csv.reader(istat_file, delimiter=';', quotechar="\\")
                             digits_as_string = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
