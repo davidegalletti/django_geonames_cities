@@ -16,7 +16,7 @@ class Country(models.Model):
     data_loaded = models.BooleanField(default=False, db_index=True)
     # Foreign countries have a code used to calculate Italian Codice Fiscale
     it_codice_catastale = models.CharField(max_length=4, blank=True, null=True)
-    it_codice_istat = models.CharField(max_length=4, blank=True, null=True)
+    it_codice_istat = models.CharField(max_length=6, blank=True, null=True)
 
     def __str__(self):
         return self.name

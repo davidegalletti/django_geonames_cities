@@ -128,5 +128,5 @@ GEONAMES_DEST_PATH = '/tmp/'
 GEONAMES_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLS']
 
 # La versione va scritta qui, su setup.cfg e su geonames/__init__.py
-VERSION = '0.10'
-VERSION_COMMENT = 'aggiunta e corretta con mappa codici importazione codice istat dei paes'
+VERSION = '0.11'
+VERSION_COMMENT = 'fix field length'
