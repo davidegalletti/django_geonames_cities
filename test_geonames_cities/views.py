@@ -4,8 +4,8 @@ from django.urls import reverse
 
 def test1(request):
     from django.core import management
-    management.call_command('synchgeonamescountries')
-    management.call_command('synchgeonames')
+    management.call_command('synchgeonamescountries_istat')
+    # management.call_command('synchgeonames')
 
     from django.test import Client
     client = Client()
