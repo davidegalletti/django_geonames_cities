@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='country',
             name='it_codice_istat',
-            field=models.CharField(blank=True, max_length=4, null=True),
+            field=models.CharField(blank=True, max_length=6, null=True),
         ),
     ]
