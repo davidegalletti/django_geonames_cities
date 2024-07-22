@@ -1,14 +1,28 @@
-import json
+import functools, json
 
-from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
+from importlib import import_module
 
 from geonames.models import Country, GeonamesAdm1, GeonamesAdm2, GeonamesAdm3, \
     GeonamesAdm4, GeonamesAdm5, PopulatedPlace
 
 
-@login_required
+def login_required_decorator(func=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            return view_func(request, *args, **kwargs)
+
+
+if hasattr(settings, "LOGIN_REQUIRED_MODULE") and hasattr(settings, "LOGIN_REQUIRED_DECORATOR"):
+    lrm = import_module(getattr(settings, "LOGIN_REQUIRED_MODULE"))
+    login_required_decorator = getattr(lrm, getattr(settings, "LOGIN_REQUIRED_DECORATOR"))
+
+
+@login_required_decorator
 def countries(request):
     try:
         q = request.GET.get('term', '')
@@ -38,7 +52,7 @@ def countries(request):
     return HttpResponse(data, mimetype)
 
 
-#@login_required
+@login_required_decorator
 def municipalities(request):
     try:
         q = request.GET.get('term', '')
