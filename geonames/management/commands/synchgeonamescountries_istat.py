@@ -18,7 +18,7 @@ class Command(BaseCommand):
     '''
 
     def handle(self, *args, **options):
-        istat_ute_url = 'https://www.istat.it/it/files//2011/01/Elenco-codici-e-denominazioni-unita-territoriali-estere.zip'
+        istat_ute_url = 'https://www.istat.it/wp-content/uploads/2024/03/Elenco-codici-e-denominazioni-unita-territoriali-estere.zip'
         # Let's import countries:
         try:
             # l'aggiornamento del codice istat da istat_ute_url non funziona perché l'elenco dei paesi non è
