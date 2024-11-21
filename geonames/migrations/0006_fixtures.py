@@ -11,6 +11,8 @@ def fixture_geonames(apps, schema_editor):
     try:
         management.call_command('synchgeonamescountries')
         management.call_command('synchgeonames')
+        management.call_command('country_it_codice_catastale')
+        management.call_command('synchgeonamescountries_istat')
     except Exception as ex:
         logger.error("fixture_geonames: %s" % str(ex))
 
