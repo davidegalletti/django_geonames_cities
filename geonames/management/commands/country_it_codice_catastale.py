@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 def fixture_country_it_codice_catastale():
     try:
+        Country.objects.get_or_create(code='--', name='APOLIDE', it_codice_catastale='Z999')
         Country.objects.filter(code='AL').update(it_codice_catastale='Z100')
         Country.objects.filter(code='AD').update(it_codice_catastale='Z101')
         Country.objects.filter(code='AT').update(it_codice_catastale='Z102')
