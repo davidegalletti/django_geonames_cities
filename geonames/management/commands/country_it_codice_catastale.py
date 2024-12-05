@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 def fixture_country_it_codice_catastale():
     try:
+        # https://www.istat.it/wp-content/uploads/2024/03/Elenco-codici-e-denominazioni-unita-territoriali-estere.zip
         Country.objects.get_or_create(code='--', name='APOLIDE', it_codice_catastale='Z999')
         Country.objects.filter(code='AL').update(it_codice_catastale='Z100')
         Country.objects.filter(code='AD').update(it_codice_catastale='Z101')
