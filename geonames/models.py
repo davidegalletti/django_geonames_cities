@@ -3,6 +3,7 @@ from django.db import models
 
 class Country(models.Model):
     name = models.CharField(max_length=200, db_index=True)
+    alternate_names = models.CharField(max_length=2000, default='', db_index=True)
     code = models.CharField(max_length=20, db_index=True)
     # municipality_levels is a list of strings blank-separated with
     # possible values GeonamesAdm1-GeonamesAdm5, PopulatedPlace
