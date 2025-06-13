@@ -1,9 +1,10 @@
 import functools, json
 
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from importlib import import_module
 
 from geonames.models import Country, GeonamesAdm1, GeonamesAdm2, GeonamesAdm3, \
@@ -26,14 +27,14 @@ if hasattr(settings, "LOGIN_REQUIRED_MODULE") and hasattr(settings, "LOGIN_REQUI
 def countries(request):
     try:
         q = request.GET.get('term', '')
-        countries = Country.objects.filter(name__icontains=q)
+        countries = Country.objects.filter(Q(name__icontains=q) | Q(alternate_names__icontains=q))
         results = []
         for c in countries:
             country_json = {
                 'id': c.id,
-                'label': c.name,
+                'label': c.name + ('(%s)' % c.alternate_names if c.alternate_names else ''),
                 'code': c.code,
-                'value': c.name,
+                'value': c.name + ('(%s)' % c.alternate_names if c.alternate_names else ''),
                 'data_loaded': c.data_loaded,
                 'nic_type': '',
                 'nic_input_mask': '',
@@ -45,11 +46,9 @@ def countries(request):
                 country_json['nic_type'] = c.nationalidentificationcodetype_set.all()[0].name
                 country_json['nic_input_mask'] = c.nationalidentificationcodetype_set.all()[0].input_mask
             results.append(country_json)
-        data = json.dumps(results)
     except:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
+        results = 'fail'
+    return JsonResponse(results, safe=False)
 
 
 @login_required_decorator
