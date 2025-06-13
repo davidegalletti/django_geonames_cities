@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import logging
 from django.db import migrations
+from django.conf import settings
 from django.core import management
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,9 @@ def fixture_geonames(apps, schema_editor):
         management.call_command('synchgeonames')
         management.call_command('country_it_codice_catastale')
         management.call_command('synchgeonamescountries_istat')
+        # opzionali
+        if settings.GEONAMES_INCLUDE_OLD_COUNTRIES:
+            management.call_command('country_it_codice_catastale_cessati')
     except Exception as ex:
         logger.error("fixture_geonames: %s" % str(ex))
 

@@ -31,6 +31,7 @@ def fixture_country_it_codice_catastale():
         Country.objects.filter(code='CS').update(it_codice_catastale='Z118')
         Country.objects.filter(code='LI').update(it_codice_catastale='Z119')
         Country.objects.filter(code='LU').update(it_codice_catastale='Z120')
+        Country.objects.filter(code='LV').update(it_codice_catastale='Z145')
         Country.objects.filter(code='MT').update(it_codice_catastale='Z121')
         Country.objects.filter(code='IM').update(it_codice_catastale='Z122')
         Country.objects.filter(code='MC').update(it_codice_catastale='Z123')
