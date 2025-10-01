@@ -26,7 +26,7 @@ class Country(models.Model):
 class GeonamesAdm(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     alternate_names = models.CharField(max_length=2000, default='', db_index=True)
-    suppressed = models.BooleanField(default=True)
+    suppressed = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
