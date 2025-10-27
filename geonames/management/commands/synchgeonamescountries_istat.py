@@ -35,7 +35,7 @@ class Command(BaseCommand):
                             'rt', encoding='latin')
             csv_reader = csv.reader(csv_file, delimiter=';', quotechar="\\")
             for row in csv_reader:
-                if row[0] == "S":
+                if row[0] in ["S", "T"]:
                     geonames_cc = row[11]
                     if row[11] in map_istat_geonames_country_codes:
                         geonames_cc = map_istat_geonames_country_codes[row[11]]
