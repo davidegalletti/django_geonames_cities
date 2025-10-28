@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
-from django.db import migrations
+from django.db import migrations, models
 from django.conf import settings
 from django.core import management
 
@@ -28,5 +28,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='country',
+            name='alternate_names',
+            field=models.CharField(db_index=True, default='', max_length=2000),
+        ),
         migrations.RunPython(fixture_geonames)
     ]
