@@ -20,6 +20,11 @@ class Migration(migrations.Migration):
             logger.error("fixture_country_istat: %s" % str(ex))
 
     operations = [
+        migrations.AddField(
+            model_name='country',
+            name='alternate_names',
+            field=models.CharField(db_index=True, default='', max_length=2000),
+        ),
         migrations.AlterField(
             model_name='country',
             name='it_codice_istat',

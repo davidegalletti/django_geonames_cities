@@ -15,7 +15,7 @@ def fixture_geonames(apps, schema_editor):
         management.call_command('country_it_codice_catastale')
         management.call_command('synchgeonamescountries_istat')
         # opzionali
-        if settings.GEONAMES_INCLUDE_OLD_COUNTRIES:
+        if hasattr(settings, 'GEONAMES_INCLUDE_OLD_COUNTRIES') and settings.GEONAMES_INCLUDE_OLD_COUNTRIES:
             management.call_command('country_it_codice_catastale_cessati')
     except Exception as ex:
         logger.error("fixture_geonames: %s" % str(ex))
@@ -28,10 +28,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='country',
-            name='alternate_names',
-            field=models.CharField(db_index=True, default='', max_length=2000),
-        ),
         migrations.RunPython(fixture_geonames)
     ]
