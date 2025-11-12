@@ -128,5 +128,5 @@ GEONAMES_DEST_PATH = '/tmp/'
 GEONAMES_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLS']
 
 # La versione va scritta qui, su setup.cfg e su geonames/__init__.py
-VERSION = '0.15.7'
-VERSION_COMMENT = '#1910 migrations'
+VERSION = '0.15.8'
+VERSION_COMMENT = '#1924 sqlmigrate'
