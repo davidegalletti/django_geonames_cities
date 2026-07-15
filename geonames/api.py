@@ -32,9 +32,9 @@ def countries(request):
         for c in countries:
             country_json = {
                 'id': c.id,
-                'label': c.name + ('(%s)' % c.alternate_names if c.alternate_names else ''),
+                'label': c.name + (' (%s)' % c.alternate_names if c.alternate_names else ''),
                 'code': c.code,
-                'value': c.name + ('(%s)' % c.alternate_names if c.alternate_names else ''),
+                'value': c.name + (' (%s)' % c.alternate_names if c.alternate_names else ''),
                 'data_loaded': c.data_loaded,
                 'nic_type': '',
                 'nic_input_mask': '',
@@ -55,6 +55,10 @@ def countries(request):
 def municipalities(request):
     try:
         q = request.GET.get('term', '')
+        suppressed = request.GET.get('suppressed', '')
+        q_suppressed = Q()
+        if suppressed:
+            q_suppressed = Q(suppressed=(suppressed == '1'))
         country_id = request.GET.get('country_id', '')
         country = Country.objects.get(id=country_id)
         results = []
@@ -66,34 +70,41 @@ def municipalities(request):
         n_of_results = 20
         for ct in content_types:
             if ct.model == "geonamesadm1":
-                exact_matches += GeonamesAdm1.objects.filter(name__iexact=q, country__id=country_id)[:n_of_results]
-                municipalities += GeonamesAdm1.objects.filter(name__icontains=q, country__id=country_id)[:n_of_results]
+                qs_suppressed = GeonamesAdm1.objects.filter(q_suppressed)
+                exact_matches += qs_suppressed.filter(name__iexact=q,
+                                                             country__id=country_id)[:n_of_results]
+                municipalities += qs_suppressed.filter(name__icontains=q,
+                                                              country__id=country_id)[:n_of_results]
             elif ct.model == "geonamesadm2":
-                exact_matches += GeonamesAdm2.objects.filter(name__iexact=q, adm1__country__id=country_id)[
-                                  :n_of_results]
-                municipalities += GeonamesAdm2.objects.filter(name__icontains=q, adm1__country__id=country_id)[
-                                  :n_of_results]
+                qs_suppressed = GeonamesAdm2.objects.filter(q_suppressed)
+                exact_matches += qs_suppressed.filter(name__iexact=q,
+                                                             adm1__country__id=country_id)[:n_of_results]
+                municipalities += qs_suppressed.filter(name__icontains=q,
+                                                              adm1__country__id=country_id)[:n_of_results]
             elif ct.model == "geonamesadm3":
-                exact_matches += GeonamesAdm3.objects.filter(name__iexact=q, adm2__adm1__country__id=country_id)[
-                                  :n_of_results]
-                municipalities += GeonamesAdm3.objects.filter(name__icontains=q, adm2__adm1__country__id=country_id)[
-                                  :n_of_results]
+                qs_suppressed = GeonamesAdm3.objects.filter(q_suppressed)
+                exact_matches += qs_suppressed.filter(name__iexact=q,
+                                                             adm2__adm1__country__id=country_id)[:n_of_results]
+                municipalities += qs_suppressed.filter(name__icontains=q,
+                                                              adm2__adm1__country__id=country_id)[:n_of_results]
             elif ct.model == "geonamesadm4":
-                exact_matches += GeonamesAdm4.objects.filter(name__iexact=q, adm3__adm2__adm1__country__id=country_id)[
-                                  :n_of_results]
-                municipalities += GeonamesAdm4.objects.filter(name__icontains=q,
+                qs_suppressed = GeonamesAdm4.objects.filter(q_suppressed)
+                exact_matches += qs_suppressed.filter(name__iexact=q,
+                                                             adm3__adm2__adm1__country__id=country_id)[:n_of_results]
+                municipalities += qs_suppressed.filter(name__icontains=q,
                                                               adm3__adm2__adm1__country__id=country_id)[:n_of_results]
             elif ct.model == "geonamesadm5":
-                exact_matches += GeonamesAdm5.objects.filter(name__iexact=q,
-                                                             adm4__adm3__adm2__adm1__country__id=country_id)[
-                                  :n_of_results]
-                municipalities += GeonamesAdm5.objects.filter(name__icontains=q,
-                                                              adm4__adm3__adm2__adm1__country__id=country_id)[
-                                  :n_of_results]
+                qs_suppressed = GeonamesAdm5.objects.filter(q_suppressed)
+                exact_matches += qs_suppressed.filter(name__iexact=q,
+                                                     adm4__adm3__adm2__adm1__country__id=country_id)[:n_of_results]
+                municipalities += qs_suppressed.filter(name__icontains=q,
+                                                      adm4__adm3__adm2__adm1__country__id=country_id)[:n_of_results]
             elif ct.model == "populatedplace":
-                exact_matches += PopulatedPlace.objects.filter(name__iexact=q, country__id=country_id)[:n_of_results]
-                municipalities += PopulatedPlace.objects.filter(name__icontains=q, country__id=country_id)[
-                                  :n_of_results]
+                qs_suppressed = PopulatedPlace.objects.filter(q_suppressed)
+                exact_matches += qs_suppressed.filter(name__iexact=q,
+                                                               country__id=country_id)[:n_of_results]
+                municipalities += qs_suppressed.filter(name__icontains=q,
+                                                                country__id=country_id)[:n_of_results]
         exact_matches.sort(key=lambda x: x.name)
         # TODO: if it starts with is to be prioritizes ws contains
         municipalities.sort(key=lambda x: x.name)
