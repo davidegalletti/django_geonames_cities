@@ -6,7 +6,9 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
-from geonames.models import GeonamesAdm3, GeonamesAdm2
+from geonames.models import GeonamesAdm1, GeonamesAdm2, GeonamesAdm3, Country
+from geonames.models import ItComuniCessati
+
 from urllib.request import urlopen
 
 logger = logging.getLogger(__name__)
@@ -110,6 +112,18 @@ def fixture_comuni_it_cessati():
     try:
         # https://situas-servizi.istat.it/publish/reportspooljson?pfun=98&pdatada=17/03/1861&pdataa=29/09/2025
 
+        italy = Country.objects.get(code='IT')
+        # creo se non esistenti adm2 e adm3 per comuni ASSORBITI in altra nazione
+        vg, _ = GeonamesAdm1.objects.get_or_create(code='90',
+                                                name='Compartimento statistico della Venezia Giulia',
+                                                suppressed=True,
+                                                country=italy)
+        fu, _ = GeonamesAdm2.objects.get_or_create(code='FU', name='Fiume o del Carnaro', suppressed=True, adm1=vg)
+        za, _ = GeonamesAdm2.objects.get_or_create(code='ZA', name='Zara', suppressed=True, adm1=vg)
+        pl, _ = GeonamesAdm2.objects.get_or_create(code='PL', name='Pola', suppressed=True, adm1=vg)
+        lb, _ = GeonamesAdm2.objects.get_or_create(code='LB', name='Lubiana', suppressed=True, adm1=vg)
+
+
         url_api = ('https://situas-servizi.istat.it/publish/reportspooljson?pfun=98&pdatada=17/03/1861&pdataa=%s' %
                    datetime.today().date().strftime('%d/%m/%Y'))
         comuni_cessati = urlopen(url_api).read()
@@ -138,6 +152,21 @@ def fixture_comuni_it_cessati():
             nome_comune = c['COMUNE']
             if c['COMUNE'] in mappa_nomi:
                 nome_comune = mappa_nomi[c['COMUNE']]
+            data_inizio = datetime.strptime(c['DATA_INIZIO_AMMINISTRATIVA'][:10], "%Y-%m-%d")
+            codice_variazione = c['COD_VARIAZIONE']
+            it_codice_catastale = c['COD_CATASTO']
+            it_codice_istat = c['PRO_COM_T']
+            if not ItComuniCessati.objects.filter(data_inizio=c['DATA_INIZIO_AMMINISTRATIVA'][:10], codice_variazione=codice_variazione,
+                                                it_codice_catastale=it_codice_catastale).exists():
+                cc = ItComuniCessati.objects.create(name=nome_comune,
+                                                       data_inizio=data_inizio,
+                                                       codice_variazione=codice_variazione,
+                                                       it_codice_catastale=it_codice_catastale,
+                                                       it_codice_istat=it_codice_istat,
+                                                       sigla_provincia=c['SIGLA_UTS'],
+                                                       name_rel=c['COMUNE_REL'],
+                                                       it_codice_catastale_rel=(c['COD_UTS_REL'] if codice_variazione=='ES' else '')
+                                                   )
             qs_and = GeonamesAdm3.objects.filter(name=nome_comune,
                                                  it_codice_catastale=c['COD_CATASTO'],
                                                  it_codice_istat=c['PRO_COM_T'])
@@ -187,7 +216,7 @@ def fixture_comuni_it_cessati():
                             ('it_codice_istat' if adm3.it_codice_istat==c['PRO_COM_T'] else (
                                     '%s!=%s' % (adm3.it_codice_istat, c['PRO_COM_T'])))
                         ))
-            else:
+            elif 'SIGLA_UTS_REL' in c:
                 qs_provincia = GeonamesAdm2.objects.filter(code=c['SIGLA_UTS_REL'])
                 if qs_provincia.exists():
                     provincia = qs_provincia.first()
@@ -201,6 +230,9 @@ def fixture_comuni_it_cessati():
                     pass
                     # print('%s %s %s non trovato e provincia non trovata %s' % (nome_comune, c['COD_CATASTO'],
                     #                                                            c['PRO_COM_T'], c['SIGLA_UTS_REL']))
+
+        for pr in GeonamesAdm2.objects.filter(adm1__country=italy):
+            ItComuniCessati.objects.filter(sigla_provincia=pr.code).update(adm2=pr)
         print(mappa_nomi_trovati)
     except Exception as ex:
         logger.error("fixture_comuni_it_cessati: %s" % str(ex))
