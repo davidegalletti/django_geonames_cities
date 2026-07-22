@@ -121,7 +121,7 @@ def municipalities(request):
             municipality_json['content_type'] = ct.model
             municipality_json['content_type_id'] = ct.id
             if ct.model == "geonamesadm3" and country.code == 'IT':
-                municipality_json['label'] = ("%s ( %s )" % (m.name, m.adm2.code))
+                municipality_json['label'] = str(m)
                 municipality_json['value'] = municipality_json['label']
                 municipality_json['codice_catastale'] = m.it_codice_catastale
             results.append(municipality_json)
