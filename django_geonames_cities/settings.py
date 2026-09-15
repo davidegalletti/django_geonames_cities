@@ -127,6 +127,7 @@ GEONAMES_INCLUDE_COUNTRIES = ['AD', 'IT']
 GEONAMES_DEST_PATH = '/tmp/'
 GEONAMES_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLS']
 
-# La versione va scritta qui, su setup.cfg e su geonames/__init__.py
-VERSION = '0.15.10'
-VERSION_COMMENT = '#1869'
+# La versione va scritta su geonames/__init__.py __version__ = "0.15.10"
+import geonames
+VERSION = (geonames.__version__ if hasattr(geonames, '__version__') else '')
+VERSION_COMMENT =  (geonames.__version_comment__ if hasattr(geonames, '__version_comment__') else '')
