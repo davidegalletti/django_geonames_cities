@@ -2,7 +2,17 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class Country(models.Model):
+class ItalianCodes(models.Model):
+    # used to calculate Italian Codice Fiscale
+    it_codice_catastale = models.CharField(max_length=4, blank=True, null=True, db_index=True)
+    # another code by ISTAT used by Regione Toscana
+    it_codice_istat = models.CharField(max_length=6, blank=True, null=True, db_index=True)
+
+    class Meta:
+        abstract = True
+
+
+class Country(ItalianCodes):
     name = models.CharField(max_length=200, db_index=True)
     alternate_names = models.CharField(max_length=2000, default='', db_index=True)
     code = models.CharField(max_length=20, db_index=True)
@@ -16,9 +26,6 @@ class Country(models.Model):
     municipality_levels = models.CharField(max_length=200, default='')
     # data_loaded is True if we have loaded from geonames data for this country
     data_loaded = models.BooleanField(default=False, db_index=True)
-    # Foreign countries have a code used to calculate Italian Codice Fiscale
-    it_codice_catastale = models.CharField(max_length=4, blank=True, null=True, db_index=True)
-    it_codice_istat = models.CharField(max_length=6, blank=True, null=True, db_index=True)
 
     def __str__(self):
         return self.name
@@ -28,6 +35,7 @@ class GeonamesAdm(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     alternate_names = models.CharField(max_length=2000, default='', db_index=True)
     suppressed = models.BooleanField(default=False)
+    postal_code = models.CharField("Postal Code", max_length=10, blank=True, db_index=True)
 
     class Meta:
         abstract = True
@@ -55,14 +63,8 @@ class GeonamesAdm2(GeonamesAdm):
         return self.name
 
 
-class GeonamesAdm3(GeonamesAdm):
-    code = models.CharField(max_length=20, db_index=True)
+class GeonamesAdm3(GeonamesAdm, ItalianCodes):
     adm2 = models.ForeignKey(GeonamesAdm2, on_delete=models.CASCADE)
-    postal_code = models.CharField("Postal Code", max_length=10)
-    # Italian municipalities are adm3 and have a code used to calculate Codice Fiscale
-    it_codice_catastale = models.CharField(max_length=4, blank=True, null=True, db_index=True)
-    # and another code used by Regione Toscana
-    it_codice_istat = models.CharField(max_length=6, blank=True, null=True, db_index=True)
 
     @property
     def country(self):
@@ -74,7 +76,7 @@ class GeonamesAdm3(GeonamesAdm):
         return self.name
 
 
-class ItComuniCessati(models.Model):
+class ItComuniCessati(ItalianCodes):
     '''
     _rel è il comune in cui quello cessato è confluito
     '''
@@ -83,8 +85,6 @@ class ItComuniCessati(models.Model):
     codice_variazione = models.CharField(max_length=10, db_index=True)
     sigla_provincia = models.CharField(max_length=2, db_index=True) #SIGLA_UTS
     #   ES=ESTINTO suppressed AS=ASSORBITO lo trovo su comuni passati in Slovenia, Francia, ...
-    it_codice_catastale = models.CharField(max_length=4, blank=True, null=True, db_index=True)
-    it_codice_istat = models.CharField(max_length=6, blank=True, null=True, db_index=True)
     name_rel = models.CharField(max_length=200, db_index=True)
     it_codice_catastale_rel = models.CharField(max_length=4, blank=True, null=True, db_index=True)
     adm2 = models.ForeignKey(GeonamesAdm2, blank=True, null=True, on_delete=models.CASCADE)
