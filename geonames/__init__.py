@@ -1,2 +1,2 @@
-__version__ = "0.15.10"
-__version_comment__ = '#1869'
+__version__ = "0.15.11"
+__version_comment__ = '#2277'
