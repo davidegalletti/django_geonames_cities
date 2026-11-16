@@ -10,13 +10,9 @@ logger = logging.getLogger(__name__)
 
 def fixture_geonames(apps, schema_editor):
     try:
-        management.call_command('synchgeonamescountries')
-        management.call_command('synchgeonames')
-        management.call_command('country_it_codice_catastale')
-        management.call_command('synchgeonamescountries_istat')
-        # opzionali
-        if hasattr(settings, 'GEONAMES_INCLUDE_OLD_COUNTRIES') and settings.GEONAMES_INCLUDE_OLD_COUNTRIES:
-            management.call_command('country_it_codice_catastale_cessati')
+        pass
+        # do nothing; it used to run commands that wouldn't work due to change in models that are
+        # managed in following migrations
     except Exception as ex:
         logger.error("fixture_geonames: %s" % str(ex))
 

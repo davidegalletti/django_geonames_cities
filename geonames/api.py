@@ -2,7 +2,7 @@ import functools, json
 
 from django.db.models import Q
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, JsonResponse
 from importlib import import_module
@@ -11,12 +11,7 @@ from geonames.models import Country, GeonamesAdm1, GeonamesAdm2, GeonamesAdm3, \
     GeonamesAdm4, GeonamesAdm5, PopulatedPlace
 
 
-def login_required_decorator(func=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
-    def decorator(view_func):
-        @functools.wraps(view_func)
-        def _wrapped_view(request, *args, **kwargs):
-            return view_func(request, *args, **kwargs)
-
+login_required_decorator = login_required
 
 if hasattr(settings, "LOGIN_REQUIRED_MODULE") and hasattr(settings, "LOGIN_REQUIRED_DECORATOR"):
     lrm = import_module(getattr(settings, "LOGIN_REQUIRED_MODULE"))
@@ -64,7 +59,8 @@ def municipalities(request):
         results = []
         content_types = []
         for ml in country.municipality_levels.split(" "):
-            content_types.append(ContentType.objects.get(app_label='geonames', model__iexact=ml))
+            if ml:
+                content_types.append(ContentType.objects.get(app_label='geonames', model__iexact=ml))
         municipalities = []
         exact_matches = []
         n_of_results = 20
@@ -114,6 +110,7 @@ def municipalities(request):
                 municipalities.remove(m)
         # if I have an exact match I send it as the first result;
         for m in exact_matches + municipalities:
+            ct = ContentType.objects.get_for_model(m)
             municipality_json = {}
             municipality_json['id'] = m.id
             municipality_json['label'] = m.name
@@ -126,7 +123,7 @@ def municipalities(request):
                 municipality_json['codice_catastale'] = m.it_codice_catastale
             results.append(municipality_json)
         data = json.dumps(results)
-    except:
+    except Exception as ex:
         data = 'fail'
     mimetype = 'application/json'
     return HttpResponse(data, mimetype)

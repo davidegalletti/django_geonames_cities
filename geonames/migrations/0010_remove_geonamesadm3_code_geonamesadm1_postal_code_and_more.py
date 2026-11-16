@@ -10,10 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='geonamesadm3',
-            name='code',
-        ),
         migrations.AddField(
             model_name='geonamesadm1',
             name='postal_code',

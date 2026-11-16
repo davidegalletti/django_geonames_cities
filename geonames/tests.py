@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 import json
 
+from geonames.models import Country
+
 
 class ApiCountriesTests(TestCase):
     def setUp(self):
@@ -43,7 +45,8 @@ class ApiCountriesTests(TestCase):
 
     def test_finds_andorra_city(self):
         self.client.login(username='john', password='johnpassword')
-        response = self.client.get('%s%s' % (reverse('geonames:municipalities'), '?term=AndOR&country_id=1'))
+        country = Country.objects.get(code='AD')
+        response = self.client.get('%s%s' % (reverse('geonames:municipalities'), f'?term=AndOR&country_id={country.id}'))
         parsed_content = json.loads(response.content)
         '''
             [

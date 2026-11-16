@@ -64,6 +64,7 @@ class GeonamesAdm2(GeonamesAdm):
 
 
 class GeonamesAdm3(GeonamesAdm, ItalianCodes):
+    code = models.CharField(max_length=20, db_index=True)
     adm2 = models.ForeignKey(GeonamesAdm2, on_delete=models.CASCADE)
 
     @property
